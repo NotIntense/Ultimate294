@@ -1,12 +1,11 @@
-﻿using Exiled.API.Enums;
-using Exiled.API.Interfaces;
-using SCP294.Types;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
+using Exiled.API.Enums;
+using Exiled.API.Interfaces;
+using SCP294.Types.Config;
 using UnityEngine;
 
-namespace SCP294.Config
+namespace SCP294
 {
     public class Config : IConfig
     {

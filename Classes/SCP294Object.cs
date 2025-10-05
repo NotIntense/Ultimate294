@@ -1,9 +1,5 @@
 ﻿using Exiled.API.Enums;
 using Exiled.API.Features;
-using MapEditorReborn.API.Features;
-using MapEditorReborn.API.Features.Objects;
-using MapEditorReborn.API.Features.Serializable;
-using MapEditorReborn.Commands.ModifyingCommands.Scale;
 using SCP294.Types;
 using SCP294.Utils;
 using System;
@@ -11,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AdminToys;
 using MEC;
 using UnityEngine;
 using Exiled.API.Features.Pickups;
@@ -18,8 +15,11 @@ using Exiled.API.Features.Toys;
 using InventorySystem.Items.Pickups;
 using InventorySystem.Items;
 using Exiled.API.Features.Items;
-using MapEditorReborn.Commands.ModifyingCommands.Position;
-using MapEditorReborn.Commands.ModifyingCommands.Rotation;
+using ProjectMER.Features;
+using ProjectMER.Features.Objects;
+using ProjectMER.Features.Serializable;
+using SCP294.Types.Config;
+using LightSourceToy = LabApi.Features.Wrappers.LightSourceToy;
 
 namespace SCP294.Classes
 {
@@ -33,7 +33,7 @@ namespace SCP294.Classes
         {
             for (; ; )
             {
-                yield return Timing.WaitForSeconds(0.1f);
+                yield return Timing.WaitForSeconds(0.5f);
 
                 foreach (Player player in Player.List)
                 {
@@ -95,13 +95,15 @@ namespace SCP294.Classes
             // Add Illumination to Front
             Vector3 lightPos = scp294.Position;
             lightPos += scp294.Rotation * new Vector3(0f, 1.25f, -1.25f);
-            SCP294.Instance.SCP294LightSources.Add(scp294,ObjectSpawner.SpawnLightSource(new LightSourceSerializable()
-            {
-                Color = "#FFF",
-                Intensity = 0.25f,
-                Shadows = true,
-                Range = 1
-            }, lightPos));
+
+            LightSourceToy light = LightSourceToy.Create();
+            light.Color = Color.white;
+            light.Intensity = 0.25f;
+            light.ShadowType = LightShadows.Soft;
+            light.Range = 1;
+            light.Position = lightPos;
+            
+            SCP294.Instance.SCP294LightSources.Add(scp294, light);
 
             // Add to 294 List
             SCP294.Instance.SpawnedSCP294s.Add(scp294, false);
@@ -141,8 +143,8 @@ namespace SCP294.Classes
             {
                 SCP294.Instance.SCP294UsesLeft[scp294] = useCount;
                 // Disable and Enable
-                SCP294.Instance.SCP294LightSources[scp294].Light.Range = useCount == 0 ? 0 : 1;
-                SCP294.Instance.SCP294LightSources[scp294].Light.Intensity = useCount == 0 ? 0 : 0.25f;
+                SCP294.Instance.SCP294LightSources[scp294].Range = useCount == 0 ? 0 : 1;
+                SCP294.Instance.SCP294LightSources[scp294].Intensity = useCount == 0 ? 0 : 0.25f;
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using CustomPlayerEffects;
+﻿using System;
+using CustomPlayerEffects;
 using Exiled.API.Enums;
 using Exiled.Events.EventArgs.Player;
 using Hazards;
@@ -9,10 +10,9 @@ using PlayerRoles.PlayableScps.Scp173;
 using RelativePositioning;
 using SCP294.Types;
 using SCP294.Types.Config;
-using System;
 using UnityEngine;
 
-namespace SCP294.handlers
+namespace SCP294.Handlers
 {
     public class playerHandler
     {
@@ -103,7 +103,7 @@ namespace SCP294.handlers
                             Vector3 targetPos = hitInfo.point + (Vector3.up * 1.25f);
                             tantrumEnvironmentalHazard.SynchronizedPosition = new RelativePosition(targetPos);
                             NetworkServer.Spawn(tantrumEnvironmentalHazard.gameObject);
-                            foreach (TeslaGate teslaGate in TeslaGateController.Singleton.TeslaGates)
+                            foreach (TeslaGate teslaGate in TeslaGate.AllGates)
                             {
                                 if (teslaGate.IsInIdleRange(args.Player.Position))
                                 {

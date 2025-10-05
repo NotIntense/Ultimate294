@@ -1,4 +1,7 @@
-﻿using CentralAuth;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using CentralAuth;
 using Exiled.API.Enums;
 using Exiled.API.Extensions;
 using Exiled.API.Features;
@@ -8,15 +11,11 @@ using Mirror;
 using PlayerRoles;
 using PlayerStatsSystem;
 using SCPSLAudioApi.AudioCore;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
 using VoiceChat;
 using VoiceChat.Codec;
-using YamlDotNet.Core.Tokens;
 
-namespace SCP294
+namespace SCP294.Classes
 {
     public class SoundHandler
     {
@@ -34,7 +33,7 @@ namespace SCP294
                 //var hubPlayer = newPlayer.GetComponent<ReferenceHub>();
                 //AudioPlayers.Add(hubPlayer);
                 //NetworkServer.AddPlayerForConnection(fakeConnection, newPlayer);
-                Npc audioNpc = SpawnFix(soundName, position != Vector3.zero ? RoleTypeId.Tutorial : RoleTypeId.Spectator, id, "");
+                Npc audioNpc = Npc.Spawn(soundName, position != Vector3.zero ? RoleTypeId.Tutorial : RoleTypeId.Spectator);
                 audioNpc.Health = 9999f;
                 //audioNpc.IsGodModeEnabled = true;
                 audioNpc.ReferenceHub.characterClassManager._godMode = true;
@@ -48,7 +47,10 @@ namespace SCP294
                 {
                     hubPlayer.nicknameSync.SetNick(soundName);
                 }
-                catch (Exception) { }
+                catch (Exception)
+                {
+                    // ignored
+                }
 
                 var audioPlayer = AudioPlayerBase.Get(hubPlayer);
 
@@ -68,10 +70,13 @@ namespace SCP294
                         hubPlayer.gameObject.transform.localScale = Vector3.zero;
                         foreach (Player item in Player.List)
                         {
-                            Server.SendSpawnMessage?.Invoke(null, new object[2] { hubPlayer.networkIdentity, item.Connection });
+                            Server.SendSpawnMessage?.Invoke(null, [hubPlayer.networkIdentity, item.Connection]);
                         }
                     }
-                    catch (Exception) { }
+                    catch (Exception)
+                    {
+                        // ignored
+                    }
                 }
                 audioPlayer.Volume = volume;
                 audioPlayer.Loop = loop;
@@ -133,57 +138,6 @@ namespace SCP294
                 //NetworkServer.Destroy(player.gameObject);
             }
             AudioPlayers.Clear();
-        }
-        public static Npc SpawnFix(string name, RoleTypeId role, int id = 0, string userId = "", Vector3? position = null)
-        {
-            GameObject gameObject = UnityEngine.Object.Instantiate(Mirror.NetworkManager.singleton.playerPrefab);
-            Npc npc = new Npc(gameObject)
-            {
-                IsNPC = true
-            };
-            try
-            {
-                npc.ReferenceHub.roleManager.InitializeNewRole(RoleTypeId.None, RoleChangeReason.None, RoleSpawnFlags.None);
-            }
-            catch (Exception arg)
-            {
-                Log.Debug($"Ignore: {arg}");
-            }
-
-            if (RecyclablePlayerId.FreeIds.Contains(id))
-            {
-                RecyclablePlayerId.FreeIds.RemoveFromQueue(id);
-            }
-            else if (RecyclablePlayerId._autoIncrement >= id)
-            {
-                id = ++RecyclablePlayerId._autoIncrement;
-            }
-
-            NetworkServer.AddPlayerForConnection(new FakeConnection(id), gameObject);
-            try
-            {
-                npc.ReferenceHub.authManager.NetworkSyncedUserId = null;
-            }
-            catch (Exception arg2)
-            {
-                Log.Debug($"Ignore: {arg2}");
-            }
-
-            npc.ReferenceHub.nicknameSync.Network_myNickSync = name;
-            Player.Dictionary.Add(gameObject, npc);
-            Timing.CallDelayed(0.3f, delegate
-            {
-                npc.Role.Set(role, SpawnReason.RoundStart, RoleSpawnFlags.None);
-            });
-            if (position.HasValue)
-            {
-                Timing.CallDelayed(0.5f, delegate
-                {
-                    npc.Position = position.Value;
-                });
-            }
-
-            return npc;
         }
     }
 }

@@ -3,7 +3,6 @@ using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Pickups.Projectiles;
 using MEC;
-using SCP294.handlers;
 using System;
 using System.Collections.Generic;
 using System.IO;

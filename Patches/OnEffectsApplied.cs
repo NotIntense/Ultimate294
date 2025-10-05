@@ -3,12 +3,13 @@ using HarmonyLib;
 using InventorySystem.Items;
 using InventorySystem.Items.Usables;
 using Mirror;
-using NorthwoodLib.Pools;
 using PlayerRoles.Voice;
 using SCP294.Classes;
 using SCP294.Types;
 using System.Collections.Generic;
 using System.Reflection.Emit;
+using Exiled.API.Features.Pools;
+using UnityEngine;
 using VoiceChat;
 using VoiceChat.Codec;
 using VoiceChat.Networking;
@@ -21,7 +22,7 @@ namespace SCP294.Patches
     {
         static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
         {
-            List<CodeInstruction> newInstructions = ListPool<CodeInstruction>.Shared.Rent(instructions);
+            List<CodeInstruction> newInstructions = ListPool<CodeInstruction>.Pool.Get(instructions);
 
             Label skip = generator.DefineLabel();
 
@@ -39,7 +40,7 @@ namespace SCP294.Patches
             foreach (CodeInstruction instruction in newInstructions)
                 yield return instruction;
 
-            ListPool<CodeInstruction>.Shared.Return(newInstructions);
+            ListPool<CodeInstruction>.Pool.Return(newInstructions);
         }
     }
 
@@ -48,7 +49,7 @@ namespace SCP294.Patches
     {
         static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
         {
-            List<CodeInstruction> newInstructions = ListPool<CodeInstruction>.Shared.Rent(instructions);
+            List<CodeInstruction> newInstructions = ListPool<CodeInstruction>.Pool.Get(instructions);
 
             Label skip = generator.DefineLabel();
 
@@ -58,15 +59,15 @@ namespace SCP294.Patches
 
             newInstructions.InsertRange(0, new List<CodeInstruction>()
             {
-                new CodeInstruction(OpCodes.Ldarg_0),
-                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(DrinkInfo), nameof(DrinkInfo.IsCustomDrink), new[] { typeof(ItemBase) })),
-                new CodeInstruction(OpCodes.Brtrue_S, skip),
+                new(OpCodes.Ldarg_0),
+                new(OpCodes.Call, AccessTools.Method(typeof(DrinkInfo), nameof(DrinkInfo.IsCustomDrink), new[] { typeof(ItemBase) })),
+                new(OpCodes.Brtrue_S, skip),
             });
 
             foreach (CodeInstruction instruction in newInstructions)
                 yield return instruction;
 
-            ListPool<CodeInstruction>.Shared.Return(newInstructions);
+            ListPool<CodeInstruction>.Pool.Return(newInstructions);
         }
     }
 
@@ -91,7 +92,7 @@ namespace SCP294.Patches
             {
                 return false;
             }
-            if (VoiceChatMutes.IsMuted(msg.Speaker, false))
+            if (VoiceChatMutes.IsMuted(msg.Speaker))
             {
                 return false;
             }
@@ -103,21 +104,20 @@ namespace SCP294.Patches
             voiceRole.VoiceModule.CurrentChannel = voiceChatChannel;
 
             Player plr = Player.Get(msg.Speaker);
-            if (SCP294.Instance.PlayerVoicePitch.TryGetValue(plr.UserId, out float pitchShift) && pitchShift != 1f)
+            if (SCP294.Instance.PlayerVoicePitch.TryGetValue(plr.UserId, out float pitchShift) && !Mathf.Approximately(pitchShift, 1f))
             {
                 float[] message = new float[48000];
                 OpusComponent comp = OpusComponent.Get(plr.ReferenceHub);
                 comp.Decoder.Decode(msg.Data, msg.DataLength, message);
 
-                comp.PitchShift(pitchShift, (long)480, 48000, message);
+                comp.PitchShift(pitchShift, 480, 48000, message);
 
                 msg.DataLength = comp.Encoder.Encode(message, msg.Data, 480);
             }
 
             foreach (ReferenceHub referenceHub in ReferenceHub.AllHubs)
             {
-                IVoiceRole voiceRole2 = referenceHub.roleManager.CurrentRole as IVoiceRole;
-                if (voiceRole2 != null)
+                if (referenceHub.roleManager.CurrentRole is IVoiceRole voiceRole2)
                 {
                     VoiceChatChannel voiceChatChannel2 = voiceRole2.VoiceModule.ValidateReceive(msg.Speaker, voiceChatChannel);
                     if (voiceChatChannel2 != VoiceChatChannel.None)

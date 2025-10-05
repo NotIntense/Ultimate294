@@ -3,17 +3,18 @@ using Player = Exiled.Events.Handlers.Player;
 using Server = Exiled.Events.Handlers.Server;
 using System;
 using System.Collections.Generic;
+using AdminToys;
 using MEC;
-using MapEditorReborn.API.Features.Objects;
 using SCP294.Classes;
 using SCP294.Types;
 using HarmonyLib;
 using Exiled.API.Enums;
-using VoiceChat.Codec;
+using ProjectMER.Features.Objects;
+using SCP294.Handlers;
 
 namespace SCP294
 {
-    public class SCP294 : Plugin<Config.Config>
+    public class SCP294 : Plugin<Config>
     {
         public override string Name => "Ultimate294";
         public override string Author => "creepycats";
@@ -25,7 +26,7 @@ namespace SCP294
 
         public Dictionary<SchematicObject, bool> SpawnedSCP294s { get; set; } = new Dictionary<SchematicObject, bool>();
         public Dictionary<SchematicObject, int> SCP294UsesLeft { get; set; } = new Dictionary<SchematicObject, int>();
-        public Dictionary<SchematicObject, LightSourceObject> SCP294LightSources { get; set; } = new Dictionary<SchematicObject, LightSourceObject>();
+        public Dictionary<SchematicObject, LabApi.Features.Wrappers.LightSourceToy> SCP294LightSources { get; set; } = new Dictionary<SchematicObject,  LabApi.Features.Wrappers.LightSourceToy>();
         public List<string> PlayersNear294 { get; set; } = new List<string>();
         public Dictionary<ushort, DrinkInfo> CustomDrinkItems = new Dictionary<ushort, DrinkInfo>();
         public DrinkManager DrinkManager = new DrinkManager();
@@ -74,13 +75,13 @@ namespace SCP294
         // OBJECT.EVENT += FUNCTION > Add Function to Callback
         // OBJECT.EVENT -= FUNCTION > Remove Function from Callback
 
-        private handlers.serverHandler ServerHandler;
-        private handlers.playerHandler PlayerHandler;
+        private serverHandler ServerHandler;
+        private playerHandler PlayerHandler;
 
         public void RegisterEvents() 
         {
-            ServerHandler = new handlers.serverHandler();
-            PlayerHandler = new handlers.playerHandler();
+            ServerHandler = new serverHandler();
+            PlayerHandler = new playerHandler();
 
             Server.RoundStarted += ServerHandler.WaitingForPlayers;
 

@@ -1,27 +1,21 @@
 ﻿using Exiled.API.Enums;
 using Exiled.API.Features;
-using Mirror;
-using Mono.Cecil;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
 
 namespace SCP294.Utils
 {
-    public class RoomHandler
+    public static class RoomHandler
     {
-        public static Room GetRandomRoom(RoomType _roomType)
+        public static Room GetRandomRoom(RoomType roomType)
         {
-            IEnumerable<Room> _roomList = Room.Get((Room room) => room.Type == _roomType);
-            return _roomList.ElementAtOrDefault(UnityEngine.Random.Range(0, _roomList.Count()));
+            var roomList = Room.Get(room => room.Type == roomType);
+            return roomList.ElementAtOrDefault(UnityEngine.Random.Range(0, roomList.Count()));
         }
-        public static Room GetRandomRoom(List<RoomType> _roomType)
+        public static Room GetRandomRoom(List<RoomType> roomType)
         {
-            IEnumerable<Room> _roomList = Room.Get((Room room) => _roomType.Contains(room.Type));
-            return _roomList.ElementAtOrDefault(UnityEngine.Random.Range(0, _roomList.Count()));
+            var roomList = Room.Get(room => roomType.Contains(room.Type));
+            return roomList.ElementAtOrDefault(UnityEngine.Random.Range(0, roomList.Count()));
         }
     }
 }

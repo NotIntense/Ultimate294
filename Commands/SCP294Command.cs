@@ -4,11 +4,6 @@ using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Items;
 using Exiled.API.Features.Pickups;
-using Exiled.API.Features.Roles;
-using Exiled.Permissions.Extensions;
-using MapEditorReborn.API.Features.Objects;
-using MapEditorReborn.Commands.ModifyingCommands.Position;
-using MapEditorReborn.Commands.ModifyingCommands.Rotation;
 using MEC;
 using Mirror;
 using PlayerRoles;
@@ -21,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using ProjectMER.Features.Objects;
 using UnityEngine;
 
 namespace SCP294.Commands

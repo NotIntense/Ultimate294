@@ -1,10 +1,9 @@
-﻿using MapEditorReborn.API.Features.Objects;
+﻿using System.Collections.Generic;
+using ProjectMER.Features.Objects;
 using SCP294.Classes;
 using SCP294.Types;
-using System.Collections.Generic;
-using VoiceChat.Codec;
 
-namespace SCP294.handlers
+namespace SCP294.Handlers
 {
     public class serverHandler
     {

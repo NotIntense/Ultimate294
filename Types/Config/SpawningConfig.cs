@@ -1,12 +1,7 @@
-﻿using Exiled.API.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using System.Collections.Generic;
+using Exiled.API.Enums;
 
-namespace SCP294.Types
+namespace SCP294.Types.Config
 {
     public class SpawningConfig
     {
